@@ -1,9 +1,9 @@
 class RealtimeClient {
-  connection: WebSocket | null = null;
-  channels: Record<string, () => void> = {};
-  isConnected: boolean = false;
-  projectId: string;
-  timeout: NodeJS.Timeout | null = null;
+  private connection: WebSocket | null = null;
+  private channels: Record<string, () => void> = {};
+  private isConnected: boolean = false;
+  private projectId: string;
+  private timeout: NodeJS.Timeout | null = null;
   constructor(projectId: string) {
     this.projectId = projectId;
     this.connection = this.connect(projectId);
