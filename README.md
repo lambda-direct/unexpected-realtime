@@ -10,16 +10,18 @@
 ### What is realtime?
 The real-time web is a network web using technologies and practices that enable users to receive information as soon as it is published by its authors, rather than requiring that they or their software check a source periodically for updates.
 
-## How it works? 
+## How it works?
+
 
 ## Getting Started
-  1. Create project on [Unexpected Cloud](https://unexpected.app)
-  2. Install NPM package
+  1. Create project on [Unexpected Cloud](https://unexpected.app).
+  2. Install NPM package.
 ```sh
 npm i unexpected-realtime
 ```
-  3.
-  4. Import RealtimeClient and create connection
+  3. Import RealtimeClient and create connection.
+
+The `projectId` can be found in the project menu in the **Details** tab or in the **Realtime** tab within the connection code snippet.
 ```typescript
 import RealtimeClient from "unexpected-realtime";
 
