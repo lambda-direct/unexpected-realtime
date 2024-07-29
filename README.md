@@ -29,7 +29,7 @@ import RealtimeClient from "unexpected-realtime";
 const realtimeClient: RealtimeClient = new RealtimeClient(projectId);
 ```
 ### RealtimeClient
-|Method|Description|Arguments|Tests|
+|Method|Description|Arguments|Result|
 |:-|:-|:-|:-|
 |`subscribe`| Subscribe to specific channel | `channelName: string, handler: () => void`  |`void`|
 |`unsubscribe`| Unsubscribe from specific channel | `channelName: string, handler: () => void`  |`void`|
