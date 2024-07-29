@@ -7,10 +7,10 @@
   </h3>
 </div>
 
-## What is realtime?
+### What is realtime?
 The real-time web is a network web using technologies and practices that enable users to receive information as soon as it is published by its authors, rather than requiring that they or their software check a source periodically for updates.
 
-## How it works?
+### How it works?
 Unexpected Cloud offers the capability for the server to notify clients about changes. The platform creates a worker with a WebSocket server and establishes a WebSocket connection. To monitor changes to a specific entity within a single WebSocket connection, the platform utilizes channels. To notify the WebSocket server about changes, simply make an HTTP request and specify the relevant channels. Once the server is notified of a change in a channel, it will send a ping message to all clients subscribed to that channel.
 
 ## Getting Started
