@@ -10,8 +10,6 @@ class RealtimeClient {
   }
 
   private connect = (projectId: string) => {
-    console.log("Connecting to Realtime Server");
-
     const connectionUrl = `wss://unexpected-realtime-${projectId}.lunaxodd.workers.dev`;
     const webSocket = new WebSocket(connectionUrl);
     webSocket.onopen = () => {
