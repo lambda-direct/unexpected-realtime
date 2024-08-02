@@ -1,4 +1,4 @@
-type Order = "asc" | "desc";
+import { Order } from "../../types";
 
 type DataSetItem = { id: number; [key: string]: unknown };
 
@@ -54,9 +54,7 @@ export {
   AuthenticateResponse,
   Config,
   DataSetItem,
-  Handlers,
   Message,
-  Order,
   QueryNextRequest,
   QueryRequest,
   QueryResponse,
