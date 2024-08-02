@@ -1,4 +1,4 @@
-class RealtimeClient {
+class PingsClient {
   private connection: WebSocket | null = null;
   private channels: Record<string, () => void> = {};
   private isConnected: boolean = false;
@@ -77,4 +77,4 @@ class RealtimeClient {
   };
 }
 
-export default RealtimeClient;
+export default PingsClient;
