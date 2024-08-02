@@ -14,33 +14,40 @@ class LiveQueryClient {
     string,
     QueryRequest["params"]
   >();
+
+  /**
+   * Connects to the LiveQuery server
+   * @constructor
+   */
   constructor(private projectId: string, private config: Config) {
     this.projectId = projectId;
     this.config = config;
-    this.connect();
+    this.connection = this.connect();
   }
 
-  private connect = () => {
+  /**
+   * Connects to the LiveQuery server
+   * @private
+   */
+  private connect = (): WebSocket => {
     const connectionUrl = `wss://${this.projectId}-lq-worker.lunaxodd.workers.dev/ws/connect`;
     const ws = new WebSocket(connectionUrl);
-    this.connection = ws;
 
     const setMap = new Map<string, ReturnType<typeof createSet>>();
 
-    this.connection.onopen = () => {
+    ws.onopen = () => {
       this.sendMessage({
         type: "authenticate",
         data: this.config.authenticate,
       });
     };
 
-    this.connection.onmessage = (event) => {
+    ws.onmessage = (event) => {
       const message = JSON.parse(event.data) as WebSocketMessage;
 
       if (message.type === "authenticate") {
         if (message.result === "fail") {
-          this.connection.close();
-
+          ws.close();
           throw new Error("Authentication failed");
         }
       } else if (message.type === "query") {
@@ -56,7 +63,9 @@ class LiveQueryClient {
         const set = setMap.get(queryName)!;
         set.set([...set.get(), ...data]);
 
-        this.config.onChange({ queryName, data: set.get() });
+        if (this.config.onChange) {
+          this.config.onChange({ queryName, data: set.get() });
+        }
       } else if (message.type === "update") {
         const { queryName, items } = message;
 
@@ -64,26 +73,31 @@ class LiveQueryClient {
 
         set.update(items);
 
-        this.config.onChange({ queryName, data: set.get() });
+        if (this.config.onChange) {
+          this.config.onChange({ queryName, data: set.get() });
+        }
       }
     };
 
-    return {
-      next: (queryName: string) => {
-        this.sendMessage({
-          type: "queryNext",
-          queryName,
-        } satisfies QueryNextRequest);
-      },
-    };
+    return ws;
   };
 
-  private sendMessage(message: Message) {
-    if (!this.connection) return;
+  /**
+   * Sends a message to the server
+   * @private
+   */
+  private sendMessage = (message: Message): void => {
+    if (!this.connection) {
+      throw new Error("Trying to send message without connection");
+    }
     this.connection.send(JSON.stringify(message));
-  }
+  };
 
-  subscribe = (queryName: string, params: QueryRequest["params"]) => {
+  /**
+   * Subscribes to a specific query
+   * @example liveQueryClient.subscribe("query-name", { order: "asc", limit: 10 });
+   */
+  subscribe = (queryName: string, params: QueryRequest["params"]): void => {
     this.sendMessage({
       type: "query",
       queryName,
@@ -92,12 +106,27 @@ class LiveQueryClient {
     this.queryParams.set(queryName, params);
   };
 
-  unsubscribe = (queryName: string) => {
+  /**
+   * Unsubscribes from a specific query
+   * @example liveQueryClient.unsubscribe("query-name");
+   */
+  unsubscribe = (queryName: string): void => {
     this.sendMessage({
       type: "queryUnsubscribe",
       queryName,
     } satisfies QueryUnsubscribeRequest);
     this.queryParams.delete(queryName);
+  };
+
+  /**
+   * Fetches the next page of the query
+   * @example liveQueryClient.next("query-name");
+   */
+  next = (queryName: string): void => {
+    this.sendMessage({
+      type: "queryNext",
+      queryName,
+    } satisfies QueryNextRequest);
   };
 }
 
