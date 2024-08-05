@@ -9,6 +9,10 @@ class PingsClient {
     this.connection = this.connect(projectId);
   }
 
+  /**
+   * Connects to the LiveQuery server
+   * @private
+   * */
   private connect = (projectId: string) => {
     const connectionUrl = `wss://unexpected-realtime-${projectId}.lunaxodd.workers.dev`;
     const webSocket = new WebSocket(connectionUrl);
@@ -29,12 +33,20 @@ class PingsClient {
     return webSocket;
   };
 
+  /**
+   * Disconnects from the LiveQuery server
+   * @private
+   * */
   private disconnect = () => {
     this.connection?.close();
     this.isConnected = false;
     this.connection = null;
   };
 
+  /**
+   * Subscribes to a specific channel
+   * @example client.subscribe("channel-name", () => console.log("Ping"));
+   */
   subscribe = (channelName: string, handler: () => void) => {
     if (this.timeout) {
       clearTimeout(this.timeout);
@@ -59,6 +71,10 @@ class PingsClient {
     this.channels[channelName] = handler;
   };
 
+  /**
+   * Unsubscribes from a specific channel
+   * @example client.unsubscribe("channel-name");
+   */
   unsubscribe = (channelName: string) => {
     const message = {
       type: "channel-unsubscribe",

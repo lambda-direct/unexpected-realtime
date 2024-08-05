@@ -10,11 +10,10 @@ import { createSet } from "./utils";
 
 class LiveQueryClient {
   private connection: WebSocket | null = null;
-  private queryParams: Map<string, QueryRequest["params"]> = new Map<
-    string,
-    QueryRequest["params"]
-  >();
-
+  private timeout: NodeJS.Timeout | null = null;
+  private queryDataset = new Map<string, ReturnType<typeof createSet>>();
+  private queryParams = new Map<string, QueryRequest["params"]>();
+  private queries = new Set<string>();
   /**
    * Connects to the LiveQuery server
    * @constructor
@@ -32,8 +31,6 @@ class LiveQueryClient {
   private connect = (): WebSocket => {
     const connectionUrl = `wss://${this.projectId}-lq-worker.lunaxodd.workers.dev/ws/connect`;
     const ws = new WebSocket(connectionUrl);
-
-    const setMap = new Map<string, ReturnType<typeof createSet>>();
 
     ws.onopen = () => {
       this.sendMessage({
@@ -53,14 +50,14 @@ class LiveQueryClient {
       } else if (message.type === "query") {
         const { queryName, data } = message;
 
-        if (!setMap.has(queryName)) {
-          setMap.set(
+        if (!this.queryDataset.has(queryName)) {
+          this.queryDataset.set(
             queryName,
             createSet(this.queryParams.get(queryName)!.order)
           );
         }
 
-        const set = setMap.get(queryName)!;
+        const set = this.queryDataset.get(queryName)!;
         set.set([...set.get(), ...data]);
 
         if (this.config.onChange) {
@@ -69,7 +66,7 @@ class LiveQueryClient {
       } else if (message.type === "update") {
         const { queryName, items } = message;
 
-        const set = setMap.get(queryName)!;
+        const set = this.queryDataset.get(queryName)!;
 
         set.update(items);
 
@@ -94,16 +91,37 @@ class LiveQueryClient {
   };
 
   /**
+   * Disconnects from the LiveQuery server
+   * @private
+   */
+  private disconnect = (): void => {
+    this.connection?.close();
+    this.connection = null;
+  };
+
+  /**
    * Subscribes to a specific query
    * @example liveQueryClient.subscribe("query-name", { order: "asc", limit: 10 });
    */
   subscribe = (queryName: string, params: QueryRequest["params"]): void => {
+    if (this.timeout) {
+      clearTimeout(this.timeout);
+      this.timeout = null;
+    }
+    if (!this.connection) {
+      this.connection = this.connect();
+    }
+    if (!this.connection) {
+      setTimeout(() => this.subscribe(queryName, params), 200);
+      return;
+    }
     this.sendMessage({
       type: "query",
       queryName,
       params,
     } satisfies QueryRequest);
     this.queryParams.set(queryName, params);
+    this.queries.add(queryName);
   };
 
   /**
@@ -115,7 +133,18 @@ class LiveQueryClient {
       type: "queryUnsubscribe",
       queryName,
     } satisfies QueryUnsubscribeRequest);
+    this.queryDataset.delete(queryName);
     this.queryParams.delete(queryName);
+    this.queries.delete(queryName);
+
+    // disconnect if no more queries
+    if (this.queries.size === 0) {
+      this.timeout = setTimeout(() => {
+        if (this.queries.size === 0) {
+          this.disconnect();
+        }
+      }, 2000);
+    }
   };
 
   /**
