@@ -7,9 +7,9 @@
   </h3>
 </div>
 
-### What is realtime?
+### What is real-time?
 
-The real-time web is a network web using technologies and practices that enable users to receive information as soon as it is published by its authors, rather than requiring that they or their software check a source periodically for updates.
+**Real-time** this is the approach that refers to the ability of a system to process data and provide responses instantaneously as events occur. Real-time web applications allow users to receive updated information without needing to refresh the page or use polling(periodically data refetching).
 
 ### How it works?
 
@@ -23,11 +23,29 @@ Create project on [Unexpected Cloud](https://unexpected.app) and install NPM pac
 npm i unexpected-realtime
 ```
 
-Found your `projectId` in the project menu in the **Details** tab or in the **Realtime** tab within the connection code snippet.
+`projectId` can be found in the project menu in the **Details** tab or in the **Realtime** tab within the connection code snippet.
 
 ## Pings
+### Server 
+Ping the client from the server using POST request with Fetch API or with Unexpected Cloud Custom Worker.
 
-```typescript
+`secretKey` can be found in the project menu in the **Details** tab or in the **Realtime** tab within the connection code snippet.
+```js
+// env.REALTIME_WORKER.fetch for Custom Workers
+fetch(
+  `https://unexpected-realtime-${projectId}.lunaxodd.workers.dev/ping`,
+  {
+    method: 'POST',
+    body: JSON.stringify({
+      secret: secretKey,
+      channels: ['channel']
+    })
+  }
+);
+```
+### Client
+Pings API allows to notify clients about changes.
+```js
 import PingsClient from "unexpected-realtime/pings";
 
 // Instance declaration of PingsClient, creates connection to realtime server.
@@ -41,11 +59,12 @@ const pingsClient = new PingsClient(projectId);
 | `subscribe`   | Subscribe to specific channel     | `channelName, handler` |
 | `unsubscribe` | Unsubscribe from specific channel | `channelName`          |
 
-## Live Queries
+## Live Query
+Live Query API allows clients to retrieve data from the server securely when it changes.
 
 ### Server
 
-```javascript
+```js
 import { createQuery, setupLive } from "unexpected-realtime/live-query/server";
 
 export const searchPosts = createQuery("posts", (qb, auth, params) => {
@@ -82,9 +101,28 @@ export default setupLive({
 });
 ```
 
+#### Deployment
+1. Install unexpected-cli-sandbox: 
+```sh
+npm i -g unexpected-cli-sandbox
+```
+2. Create table trigger for `posts` table:
+```sh
+unexpected-cli-sandbox set-trigger --table posts
+```
+3. Deploy Live Query Worker:
+```sh
+unexpected-cli-sandbox deploy-live-query
+```
+
+##### `createQuery` arguments:
+1. `qb` (Query builder) builds the query.
+2. `auth` (Auth context) contains the data returned from the getAuthContext function. Allows to filter data for specific users in query builder.
+3. `params` (Query parameters) includes essential information such as order and limit. It can also contain custom parameters specific to your query needs.
+
 ### Client
 
-```typescript
+```js
 import LiveQueryClient from "unexpected-realtime/live-query/client";
 
 // Instance declaration of LiveQueryClient, creates connection to live server.
