@@ -100,6 +100,10 @@ export default setupLive({
   },
 });
 ```
+#### `createQuery` arguments:
+1. `qb` (Query builder) builds the query.
+2. `auth` (Auth context) contains the data returned from the getAuthContext function. Allows to filter data for specific users in query builder.
+3. `params` (Query parameters) includes essential information such as order and limit. It can also contain custom parameters specific to your query needs.
 
 #### Deployment
 1. Install unexpected-cli-sandbox: 
@@ -115,10 +119,6 @@ unexpected-cli-sandbox set-trigger --table posts
 unexpected-cli-sandbox deploy-live-query
 ```
 
-##### `createQuery` arguments:
-1. `qb` (Query builder) builds the query.
-2. `auth` (Auth context) contains the data returned from the getAuthContext function. Allows to filter data for specific users in query builder.
-3. `params` (Query parameters) includes essential information such as order and limit. It can also contain custom parameters specific to your query needs.
 
 ### Client
 
