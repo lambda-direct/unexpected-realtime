@@ -8,29 +8,92 @@
 </div>
 
 ### What is realtime?
+
 The real-time web is a network web using technologies and practices that enable users to receive information as soon as it is published by its authors, rather than requiring that they or their software check a source periodically for updates.
 
 ### How it works?
+
 Unexpected Cloud offers the capability for the server to notify clients about changes. The platform creates a worker with a WebSocket server and establishes a WebSocket connection. To monitor changes to a specific entity within a single WebSocket connection, the platform utilizes channels. To notify the WebSocket server about changes, simply make an HTTP request and specify the relevant channels. Once the server is notified of a change in a channel, it will send a ping message to all clients subscribed to that channel.
 
 ## Getting Started
-  1. Create project on [Unexpected Cloud](https://unexpected.app).
-  2. Install NPM package.
+
+Create project on [Unexpected Cloud](https://unexpected.app) and install NPM package.
+
 ```sh
 npm i unexpected-realtime
 ```
-  3. Import RealtimeClient and create connection.
 
-The `projectId` can be found in the project menu in the **Details** tab or in the **Realtime** tab within the connection code snippet.
+Found your `projectId` in the project menu in the **Details** tab or in the **Realtime** tab within the connection code snippet.
+
+## Pings
+
 ```typescript
-import RealtimeClient from "unexpected-realtime";
+import PingsClient from "unexpected-realtime/pings";
 
-// Instance declaration of RealtimeClient, creates a WebSocket connection.
-const realtimeClient: RealtimeClient = new RealtimeClient(projectId);
+// Instance declaration of PingsClient, creates connection to realtime server.
+const pingsClient = new PingsClient(projectId);
 ```
-### RealtimeClient
-|Method|Description|Arguments|Result|
-|:-|:-|:-|:-|
-|`subscribe`| Subscribe to specific channel | `channelName: string, handler: () => void`  |`void`|
-|`unsubscribe`| Unsubscribe from specific channel | `channelName: string, handler: () => void`  |`void`|
 
+### RealtimeClient
+
+| Method        | Description                       | Arguments              |
+| :------------ | :-------------------------------- | :--------------------- |
+| `subscribe`   | Subscribe to specific channel     | `channelName, handler` |
+| `unsubscribe` | Unsubscribe from specific channel | `channelName`          |
+
+## Live Queries
+
+### Server
+
+```javascript
+import { createQuery, setupLive } from "unexpected-realtime/live-query/server";
+
+export const searchPosts = createQuery("posts", (qb, auth, params) => {
+  const conditions = [];
+
+  if (params.lastId) {
+    conditions.push({
+      column: "rowid",
+      [params.order === "asc" ? "gt" : "lt"]: params.lastId,
+    });
+  }
+
+  return qb
+    .select("posts")
+    .where({
+      and: conditions,
+    })
+    .limit(params.limit)
+    .order(params.order);
+});
+
+export const getAuthContext = async (env, data) => {
+  return {
+    id: 1,
+    username: "test",
+  };
+};
+
+export default setupLive({
+  getAuthContext,
+  queries: {
+    searchPosts,
+  },
+});
+```
+
+### Client
+
+```typescript
+import LiveQueryClient from "unexpected-realtime/live-query/client";
+
+// Instance declaration of LiveQueryClient, creates connection to live server.
+const liveQueryClient = new LiveQueryClient(projectId);
+```
+**LiveQueryClient**
+
+| Method        | Description                        | Arguments           |
+| :------------ | :--------------------------------- | :------------------ |
+| `subscribe`   | Subscribe to specific query        | `queryName, params` |
+| `unsubscribe` | Unsubscribe from specific query    | `queryName`         |
+| `next`        | Fetches the next page of the query | `queryName`         |

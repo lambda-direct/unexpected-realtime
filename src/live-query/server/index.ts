@@ -1,6 +1,6 @@
 import { AuthContextProducer, QueryProducer } from "./types";
 
-export const createQuery = (
+const createQuery = (
   triggerTable: string,
   queryProducer: QueryProducer
 ) => ({
@@ -8,7 +8,7 @@ export const createQuery = (
   triggerTable,
 });
 
-export const setupLive = (data: {
+const setupLive = (data: {
   getAuthContext: AuthContextProducer<any>;
   queries: Record<
     string,
@@ -20,3 +20,5 @@ export const setupLive = (data: {
     queries: data.queries,
   };
 };
+
+export { createQuery, setupLive };
