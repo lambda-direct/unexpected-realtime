@@ -3,16 +3,34 @@
   "name": "unexpected-realtime",
   "version": "0.0.9",
   "main": "index.js",
+  "license": "Apache-2.0",
+  "sideEffects": false,
+  "publishConfig": {
+    "provenance": true
+  },
   "scripts": {
     "build": "npx tsx scripts/build.ts"
   },
   "author": "",
-  "license": "ISC",
   "description": "",
   "devDependencies": {
     "@types/node": "^20.14.14",
     "tsup": "^8.2.4",
     "tsx": "^4.17.0",
     "typescript": "^5.5.4"
+  },
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./index.d.ts",
+        "default": "./index.js"
+      },
+      "require": {
+        "types": "./index.d.cjs",
+        "default": "./index.cjs"
+      },
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    }
   }
 }
