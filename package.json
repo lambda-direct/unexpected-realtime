@@ -1,16 +1,43 @@
 {
+  "type": "module",
   "name": "unexpected-realtime",
-  "version": "0.0.6",
+  "version": "0.0.10",
   "main": "index.js",
+  "license": "Apache-2.0",
+  "sideEffects": false,
+  "publishConfig": {
+    "provenance": true
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lambda-direct/unexpected-realtime"
+  },
+  "homepage": "https://github.com/lambda-direct/unexpected-realtime",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npx tsc --outDir dist"
+    "build": "npx tsx scripts/build.ts",
+    "pack": "(cd dist && npm pack --pack-destination ..) && rm -f package.tgz && mv *.tgz package.tgz",
+    "publish": "npm publish package.tgz"
   },
   "author": "",
-  "license": "ISC",
   "description": "",
   "devDependencies": {
-    "@types/node": "^20.14.12",
+    "@types/node": "^20.14.14",
+    "tsup": "^8.2.4",
+    "tsx": "^4.17.0",
     "typescript": "^5.5.4"
+  },
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./index.d.ts",
+        "default": "./index.js"
+      },
+      "require": {
+        "types": "./index.d.cjs",
+        "default": "./index.cjs"
+      },
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    }
   }
 }
