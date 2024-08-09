@@ -8,6 +8,11 @@
   "publishConfig": {
     "provenance": true
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lambda-direct/unexpected-realtime"
+  },
+  "homepage": "https://github.com/lambda-direct/unexpected-realtime",
   "scripts": {
     "build": "npx tsx scripts/build.ts",
     "pack": "(cd dist && npm pack --pack-destination ..) && rm -f package.tgz && mv *.tgz package.tgz",
@@ -30,10 +35,6 @@
       "require": {
         "types": "./index.d.cjs",
         "default": "./index.cjs"
-      },
-      "repository": {
-        "type": "git",
-        "url": "https://github.com/lambda-direct/unexpected-realtime"
       },
       "types": "./index.d.ts",
       "default": "./index.js"
