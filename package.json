@@ -31,6 +31,10 @@
         "types": "./index.d.cjs",
         "default": "./index.cjs"
       },
+      "repository": {
+        "type": "git",
+        "url": "git+https://github.com/lambda-direct/unexpected-realtime.git"
+      },
       "types": "./index.d.ts",
       "default": "./index.js"
     }
