@@ -1,15 +1,18 @@
 {
+  "type": "module",
   "name": "unexpected-realtime",
   "version": "0.0.9",
   "main": "index.js",
   "scripts": {
-    "build": "npx tsc --outDir dist && cp package.json ./dist/ && cp README.md ./dist/"
+    "build": "npx tsx scripts/build.ts"
   },
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
-    "@types/node": "^20.14.12",
+    "@types/node": "^20.14.14",
+    "tsup": "^8.2.4",
+    "tsx": "^4.17.0",
     "typescript": "^5.5.4"
   }
 }
