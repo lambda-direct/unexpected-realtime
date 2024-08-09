@@ -1,4 +1,4 @@
-class RealtimeClient {
+class PingsClient {
   private connection: WebSocket | null = null;
   private channels: Record<string, () => void> = {};
   private isConnected: boolean = false;
@@ -9,7 +9,11 @@ class RealtimeClient {
     this.connection = this.connect(projectId);
   }
 
-  private connect = (projectId: string) => {
+  /**
+   * Connects to the LiveQuery server
+   * @private
+   * */
+  private connect = (projectId: string): WebSocket => {
     const connectionUrl = `wss://unexpected-realtime-${projectId}.lunaxodd.workers.dev`;
     const webSocket = new WebSocket(connectionUrl);
     webSocket.onopen = () => {
@@ -29,13 +33,21 @@ class RealtimeClient {
     return webSocket;
   };
 
-  private disconnect = () => {
+  /**
+   * Disconnects from the LiveQuery server
+   * @private
+   * */
+  private disconnect = (): void => {
     this.connection?.close();
     this.isConnected = false;
     this.connection = null;
   };
 
-  subscribe = (channelName: string, handler: () => void) => {
+  /**
+   * Subscribes to a specific channel
+   * @example client.subscribe("channel-name", () => console.log("Ping"));
+   */
+  subscribe = (channelName: string, handler: () => void): void => {
     if (this.timeout) {
       clearTimeout(this.timeout);
       this.timeout = null;
@@ -44,7 +56,8 @@ class RealtimeClient {
       this.connection = this.connect(this.projectId);
     }
     if (!this.isConnected) {
-      return setTimeout(() => this.subscribe(channelName, handler), 200);
+      setTimeout(() => this.subscribe(channelName, handler), 200);
+      return;
     }
     if (this.channels[channelName]) {
       this.channels[channelName] = handler;
@@ -59,7 +72,11 @@ class RealtimeClient {
     this.channels[channelName] = handler;
   };
 
-  unsubscribe = (channelName: string) => {
+  /**
+   * Unsubscribes from a specific channel
+   * @example client.unsubscribe("channel-name");
+   */
+  unsubscribe = (channelName: string): void => {
     const message = {
       type: "channel-unsubscribe",
       channel: channelName,
@@ -77,4 +94,4 @@ class RealtimeClient {
   };
 }
 
-export default RealtimeClient;
+export default PingsClient;
