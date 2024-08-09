@@ -5,6 +5,9 @@
   "main": "index.js",
   "license": "Apache-2.0",
   "sideEffects": false,
+  "publishConfig": {
+    "provenance": true
+  },
   "scripts": {
     "build": "npx tsx scripts/build.ts",
     "pack": "(cd dist && npm pack --pack-destination ..) && rm -f package.tgz && mv *.tgz package.tgz",
