@@ -9,7 +9,9 @@
     "provenance": true
   },
   "scripts": {
-    "build": "npx tsx scripts/build.ts"
+    "build": "npx tsx scripts/build.ts",
+    "pack": "(cd dist && npm pack --pack-destination ..) && rm -f package.tgz && mv *.tgz package.tgz",
+    "publish": "npm publish package.tgz"
   },
   "author": "",
   "description": "",
