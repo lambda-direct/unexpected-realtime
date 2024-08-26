@@ -1,4 +1,4 @@
-import { AuthContextProducer, QueryProducer } from "./types";
+import type { AuthContextProducer, QueryProducer } from "./types";
 
 const createQuery = (
   triggerTable: string,
@@ -9,6 +9,7 @@ const createQuery = (
 });
 
 const setupLive = (data: {
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   getAuthContext: AuthContextProducer<any>;
   queries: Record<
     string,

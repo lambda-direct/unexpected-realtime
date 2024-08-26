@@ -1,7 +1,7 @@
 class PingsClient {
   private connection: WebSocket | null = null;
   private channels: Record<string, () => void> = {};
-  private isConnected: boolean = false;
+  private isConnected = false;
   private projectId: string;
   private timeout: NodeJS.Timeout | null = null;
   constructor(projectId: string) {

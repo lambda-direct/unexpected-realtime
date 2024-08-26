@@ -1,5 +1,5 @@
 import { Order } from "../../types";
-import { RealtimeEvent } from "./types";
+import type { RealtimeEvent } from "./types";
 
 export const createSet = <T extends { id: number }>(_order: Order) => {
   let set: T[] = [];

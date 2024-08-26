@@ -1,5 +1,5 @@
-import { Order } from "../../types";
-import { QueryBuilder } from "./QueryBuilder";
+import type { Order } from "../../types";
+import type { QueryBuilder } from "./QueryBuilder";
 
 export type WhereStatement =
   | { and: WhereStatement[] }

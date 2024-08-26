@@ -1,88 +1,94 @@
 import { Order } from "../../types";
-import { SelectQuery, SerializableQueryBuilder, WhereStatement } from "./types";
+import type {
+	SelectQuery,
+	SerializableQueryBuilder,
+	WhereStatement,
+} from "./types";
 
 export class SelectQueryBuilder implements SerializableQueryBuilder {
-  constructor(private query: SelectQuery) {}
+	constructor(private query: SelectQuery) {}
 
-  where(statement: WhereStatement): Omit<typeof this, "where"> {
-    this.query.where = statement;
+	where(statement: WhereStatement): Omit<typeof this, "where"> {
+		this.query.where = statement;
 
-    return this;
-  }
+		return this;
+	}
 
-  order(direction: Order): Omit<typeof this, "order"> {
-    this.query.order = direction;
+	order(direction: Order): Omit<typeof this, "order"> {
+		this.query.order = direction;
 
-    return this;
-  }
+		return this;
+	}
 
-  limit(value: number): Omit<typeof this, "limit"> {
-    this.query.limit = value;
+	limit(value: number): Omit<typeof this, "limit"> {
+		this.query.limit = value;
 
-    return this;
-  }
+		return this;
+	}
 
-  private mapWhere(statement?: WhereStatement): string | undefined {
-    if (!statement) {
-      return;
-    }
+	private mapWhere(statement?: WhereStatement): string | undefined {
+		if (!statement) {
+			return;
+		}
 
-    if ("and" in statement) {
-      const mapped = statement.and.map((item) => this.mapWhere(item));
+		if ("and" in statement) {
+			const mapped = statement.and.map((item) => this.mapWhere(item));
 
-      if (!mapped.length) {
-        return;
-      }
+			if (!mapped.length) {
+				return;
+			}
 
-      return `(${mapped.join(" AND ")})`;
-    } else if ("or" in statement) {
-      const mapped = statement.or.map((item) => this.mapWhere(item));
+			return `(${mapped.join(" AND ")})`;
+		}
 
-      if (!mapped.length) {
-        return;
-      }
+		if ("or" in statement) {
+			const mapped = statement.or.map((item) => this.mapWhere(item));
 
-      return `(${mapped.join(" OR ")})`;
-    }
+			if (!mapped.length) {
+				return;
+			}
 
-    const { column, ...ops } = statement;
+			return `(${mapped.join(" OR ")})`;
+		}
 
-    const [[op, value]] = Object.entries(ops);
-    const map: Record<Exclude<keyof typeof statement, "column">, string> = {
-      gt: ">",
-      gte: ">=",
-      lt: "<",
-      lte: "<=",
-      eq: "=",
-      neq: "!=",
-      like: "like",
-      ilike: "ilike",
-    };
+		const { column, ...ops } = statement;
 
-    let realValue = value;
+		const [op, value] = Object.entries<string>(ops)[0]!;
+		const map: Record<Exclude<keyof typeof statement, "column">, string> = {
+			gt: ">",
+			gte: ">=",
+			lt: "<",
+			lte: "<=",
+			eq: "=",
+			neq: "!=",
+			like: "like",
+			ilike: "ilike",
+		};
 
-    if (typeof realValue === "string") {
-      realValue = `'${realValue}'`;
-    }
+		let realValue = value;
 
-    return `${statement.column} ${map[op as keyof typeof map]} ${realValue}`;
-  }
+		if (typeof realValue === "string") {
+			realValue = `'${realValue}'`;
+		}
 
-  serialize(): string {
-    const where = this.mapWhere(this.query.where);
+		return `${statement.column} ${map[op as keyof typeof map]} ${realValue}`;
+	}
 
-    return `
+	serialize(): string {
+		const where = this.mapWhere(this.query.where);
+
+		return `
             SELECT rowid, t.* from ${this.query.from} as t
-            ${where ? `WHERE ${where}` : ``}
+            ${where ? `WHERE ${where}` : ""}
             ORDER BY rowid ${this.query.order}
     
-            ${this.query.limit ? `LIMIT ${this.query.limit}` : ``}
+            ${this.query.limit ? `LIMIT ${this.query.limit}` : ""}
         `;
-  }
+	}
 }
 
 export class QueryBuilder {
-  select(table: string) {
-    return new SelectQueryBuilder({ from: table, order: Order.DESC });
-  }
+	select(table: string) {
+		return new SelectQueryBuilder({ from: table, order: Order.DESC });
+	}
 }

@@ -1,9 +1,9 @@
-import { Order } from "../../types";
+import type { Order } from "../../types";
 
 type DataSetItem = { id: number; [key: string]: unknown };
 
 type Config = {
-  authenticate: any;
+  authenticate: unknown;
   onAuthenticate?: () => AuthenticateResponse;
   onChange?: (data: { queryName: string; data: DataSetItem[] }) => void;
 };
@@ -50,7 +50,7 @@ type WebSocketMessage = AuthenticateResponse | QueryResponse | UpdateResponse;
 
 type AuthenticateResponse = Message<"authenticate", { result: "ok" | "fail" }>;
 
-export {
+export type {
   AuthenticateResponse,
   Config,
   DataSetItem,
