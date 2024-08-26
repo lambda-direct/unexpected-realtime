@@ -29,7 +29,7 @@ class LiveQueryClient {
    * @private
    */
   private connect = (): WebSocket => {
-    const connectionUrl = `wss://${this.projectId}-lq-worker.lunaxodd.workers.dev/ws/connect`;
+    const connectionUrl = `wss://unexpected-live-query-${this.projectId}.alex-blokh.workers.dev/ws/connect`;
     const ws = new WebSocket(connectionUrl);
 
     ws.onopen = () => {

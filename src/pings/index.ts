@@ -14,7 +14,7 @@ class PingsClient {
    * @private
    * */
   private connect = (projectId: string): WebSocket => {
-    const connectionUrl = `wss://unexpected-realtime-${projectId}.lunaxodd.workers.dev`;
+    const connectionUrl = `wss://unexpected-realtime-${projectId}.alex-blokh.workers.dev`;
     const webSocket = new WebSocket(connectionUrl);
     webSocket.onopen = () => {
       this.isConnected = true;
