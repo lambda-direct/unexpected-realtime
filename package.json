@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "unexpected-realtime",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "main": "index.js",
   "license": "Apache-2.0",
   "sideEffects": false,
@@ -28,16 +28,20 @@
   },
   "exports": {
     ".": {
-      "import": {
-        "types": "./index.d.ts",
-        "default": "./index.js"
-      },
-      "require": {
-        "types": "./index.d.cjs",
-        "default": "./index.cjs"
-      },
-      "types": "./index.d.ts",
-      "default": "./index.js"
+        "import": "./index.js",
+        "require": "./index.cjs"
+    },
+    "./pings": {
+        "import": "./pings/index.js",
+        "require": "./pings/index.cjs"
+    },
+    "./live-query/client": {
+        "import": "./live-query/client/index.js",
+        "require": "./live-query/client/index.cjs"
+    },
+    "./live-query/server": {
+        "import": "./live-query/server/index.js",
+        "require": "./live-query/server/index.cjs"
     }
   }
 }
