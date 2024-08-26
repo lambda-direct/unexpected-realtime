@@ -5,10 +5,12 @@ fs.rmSync("dist", { recursive: true, force: true });
 
 await build({
 	entry: [
+		"src/index.ts",
 		"src/pings/index.ts",
 		"src/live-query/client/index.ts",
-		"src/live-query/client/index.ts",
+		"src/live-query/server/index.ts",
 	],
+	bundle: true,
 	splitting: false,
 	sourcemap: true,
 	dts: true,
