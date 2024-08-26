@@ -19,18 +19,116 @@ Unexpected Cloud offers the capability for the server to notify clients about ch
 ```sh
 npm i unexpected-realtime
 ```
-  3. Import RealtimeClient and create connection.
 
-The `projectId` can be found in the project menu in the **Details** tab or in the **Realtime** tab within the connection code snippet.
-```typescript
-import RealtimeClient from "unexpected-realtime";
+`projectId` can be found in the project menu in the **Details** tab or in the **Realtime** tab within the connection code snippet.
 
-// Instance declaration of RealtimeClient, creates a WebSocket connection.
-const realtimeClient: RealtimeClient = new RealtimeClient(projectId);
+## Pings
+### Server 
+Ping the client from the server using POST request with Fetch API or with Unexpected Cloud Custom Worker.
+
+`secretKey` can be found in the project menu in the **Details** tab or in the **Realtime** tab within the connection code snippet.
+```js
+// env.REALTIME_WORKER.fetch for Custom Workers
+fetch(
+  `https://unexpected-realtime-${projectId}.lunaxodd.workers.dev/ping`,
+  {
+    method: 'POST',
+    body: JSON.stringify({
+      secret: secretKey,
+      channels: ['channel']
+    })
+  }
+);
 ```
-### RealtimeClient
-|Method|Description|Arguments|Result|
-|:-|:-|:-|:-|
-|`subscribe`| Subscribe to specific channel | `channelName: string, handler: () => void`  |`void`|
-|`unsubscribe`| Unsubscribe from specific channel | `channelName: string, handler: () => void`  |`void`|
+### Client
+Pings API allows to notify clients about changes.
+```js
+import PingsClient from "unexpected-realtime/pings";
 
+// Instance declaration of PingsClient, creates connection to realtime server.
+const pingsClient = new PingsClient(projectId);
+```
+
+### RealtimeClient
+
+| Method        | Description                       | Arguments              |
+| :------------ | :-------------------------------- | :--------------------- |
+| `subscribe`   | Subscribe to specific channel     | `channelName, handler` |
+| `unsubscribe` | Unsubscribe from specific channel | `channelName`          |
+
+## Live Query
+Live Query API allows clients to retrieve data from the server securely when it changes.
+
+### Server
+
+```js
+import { createQuery, setupLive } from "unexpected-realtime/live-query/server";
+
+export const searchPosts = createQuery("posts", (qb, auth, params) => {
+  const conditions = [];
+
+  if (params.lastId) {
+    conditions.push({
+      column: "rowid",
+      [params.order === "asc" ? "gt" : "lt"]: params.lastId,
+    });
+  }
+
+  return qb
+    .select("posts")
+    .where({
+      and: conditions,
+    })
+    .limit(params.limit)
+    .order(params.order);
+});
+
+export const getAuthContext = async (env, data) => {
+  return {
+    id: 1,
+    username: "test",
+  };
+};
+
+export default setupLive({
+  getAuthContext,
+  queries: {
+    searchPosts,
+  },
+});
+```
+#### `createQuery` arguments:
+1. `qb` (Query builder) builds the query.
+2. `auth` (Auth context) contains the data returned from the getAuthContext function. Allows to filter data for specific users in query builder.
+3. `params` (Query parameters) includes essential information such as order and limit. It can also contain custom parameters specific to your query needs.
+
+#### Deployment
+1. Install unexpected-cli-sandbox: 
+```sh
+npm i -g unexpected-cli-sandbox
+```
+2. Create table trigger for `posts` table:
+```sh
+unexpected-cli-sandbox set-trigger --table posts
+```
+3. Deploy Live Query Worker:
+```sh
+unexpected-cli-sandbox deploy-live-query
+```
+
+
+### Client
+
+```js
+import LiveQueryClient from "unexpected-realtime/live-query/client";
+
+// Instance declaration of LiveQueryClient, creates connection to live server.
+const liveQueryClient = new LiveQueryClient(projectId);
+```
+**LiveQueryClient**
+
+| Method        | Description                        | Arguments           |
+| :------------ | :--------------------------------- | :------------------ |
+| `subscribe`   | Subscribe to specific query        | `queryName, params` |
+| `unsubscribe` | Unsubscribe from specific query    | `queryName`         |
+| `next`        | Fetches the next page of the query | `queryName`         |
