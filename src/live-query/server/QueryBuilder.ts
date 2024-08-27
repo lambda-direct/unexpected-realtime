@@ -1,4 +1,4 @@
-import { Order } from "../../types";
+import type { Order } from "../types";
 import type {
 	SelectQuery,
 	SerializableQueryBuilder,
@@ -89,6 +89,6 @@ export class SelectQueryBuilder implements SerializableQueryBuilder {
 
 export class QueryBuilder {
 	select(table: string) {
-		return new SelectQueryBuilder({ from: table, order: Order.DESC });
+		return new SelectQueryBuilder({ from: table, order: "desc" });
 	}
 }
