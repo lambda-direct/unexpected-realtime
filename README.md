@@ -123,7 +123,7 @@ unexpected-cli-sandbox deploy-live-query
 import LiveQueryClient from "unexpected-realtime/live-query/client";
 
 // Instance declaration of LiveQueryClient, creates connection to live server.
-const liveQueryClient = new LiveQueryClient(projectId);
+const liveQueryClient = new LiveQueryClient('https://...');
 ```
 **LiveQueryClient**
 
