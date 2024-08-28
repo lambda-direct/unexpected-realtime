@@ -13,13 +13,13 @@ export const createSet = <T extends { id: number }>(_order: Order) => {
 		update: (events: RealtimeEvent<T>[]) => {
 			for (const event of events) {
 				const elementIndex = set.findLastIndex((item) => {
-					return order === Order.ASC
+					return order === 'asc'
 						? item.id <= event.entityId
 						: item.id >= event.entityId;
 				});
 
 				if (event.operation === "insert") {
-					const index = order === Order.ASC ? set.length - 1 : 0;
+					const index = order === 'asc' ? set.length - 1 : 0;
 					set = set.toSpliced(index, 0, event.data);
 				} else if (event.operation === "update") {
 					set = set.toSpliced(elementIndex, 1, event.data);
